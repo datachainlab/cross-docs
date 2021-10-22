@@ -7,7 +7,8 @@ id: atomic-commit-protocol
 
 Atomic commit protocolとは、複数の操作の集合を1つの処理として実行可能にするプロトコルである。代表的なものとしては、Two-phase commitやThree-phase commitなどがある。我々の文脈では、複数のブロックチェーンのトランザクションを1つのトランザクションとして実行するためのプロトコルを指す。
 
-Cross Frameworkでは、現在、Simple commit protocol, Two-phase commit protocolの2種類のプロトコルをサポートしており、トランザクションの作成時に指定が可能である。Simple protocolは、参加者が2者に限られ、Two-phase commitは参加者が3者以上であってもサポートできる。しかし、Simple protocolと比較するとフロー中のステップ数が多くなっており、完了までの時間が長くなる。これらの各方式の詳細については、[Two-phase commit protocol](#two-phase-commit-protocol), [Simple commit protocol](#simple-commit-protocol)で述べる。また、トランザクションの作成に関する詳細は[Cross-chain Transaction](./03-architecture/03-cross-chain-transaction.md)で述べる。
+Cross Frameworkでは、現在、Simple commit protocol, Two-phase commit protocolの2種類のプロトコルをサポートしており、トランザクションの作成時に指定が可能である。これらのプロトコルでは、トランザクションで指定される各処理を実行する参加者と参加者が共通の決定を得るためのコーディネートを行うコーディネーターの2つのロールがある。
+Simple protocolは、参加者が2つに限られることと参加者のうちの1つがコーディネーターを担う。一方、Two-phase commitは参加者に制約はなく、参加者ではないコーディネーターを利用することも可能である。しかし、Simple protocolと比較するとフロー中のステップ数が多くなっており、完了までの時間が長くなる。これらの各方式の詳細については、[Two-phase commit protocol](#two-phase-commit-protocol), [Simple commit protocol](#simple-commit-protocol)で述べる。また、トランザクションの作成に関する詳細は[Cross-chain Transaction](./03-architecture/03-cross-chain-transaction.md)で述べる。
 
 ## Two-phase commit protocol
 
