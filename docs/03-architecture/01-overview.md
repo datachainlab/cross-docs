@@ -29,7 +29,7 @@ Authenticatorはトランザクションの認証処理の提供とその状態�
 
 Tx Runnerは、Authenticatorにより認証が成功したトランザクションを実行する。トランザクションは複数チェーン上で実行されるため、それらをAtomicに実行できなければならない。そのため、[Atomic commit protocol](./03-architecture/04-atomic-commit-protocol.md)をサポートしている。e.g. Two-phase commit protocol, Simple commit protocol
 
-TransactionがどのCommit protocolを用いるかは、`MsgInitiateTx`で指定された方式に従う。提出Chainは、そのCommit protocolのcoordinatorとなり、他チェーンとIBC Channelを通してメッセージングを行い、Commit or Abortの決定を行い、各参加者にそれを要求する。
+TransactionがどのCommit protocolを用いるかは、`MsgInitiateTx`で指定された方式に従う。提出ChainはそのCommit protocolのcoordinatorとなり、他チェーンとIBC Channelを通してメッセージングを行う。そして、Commit or Abortの決定を行い、各参加者にその結果をリクエストする。
 
 ### Contract Manager
 
@@ -47,4 +47,4 @@ type ContractModule interface {
 }
 ```
 
-TxRunnerにより、呼び出し情報、認証情報とともに`OnContractCall`が呼ばれることでContractは実行される。一般的には、最初に`signers`に指定されるAccountの認証方式が期待したものであることを確認する必要がある。Contract Moduleの実装例は[ここ](https://github.com/datachainlab/cross/blob/v0.2.0/simapp/samplemod/module.go)で確認できる。
+TxRunnerにより、呼び出し情報、認証情報とともに`OnContractCall`が呼ばれることでContractは実行される。Contractは一般的には、`signers`で指定されたAccountの認証方式が期待したものであることを確認する必要がある。Contract Moduleの実装例は[ここ](https://github.com/datachainlab/cross/blob/v0.2.0/simapp/samplemod/module.go)で確認できる。

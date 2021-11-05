@@ -11,7 +11,7 @@ Cross Frameworkでは、複数のAtomic commit protocolをサポートし、ま�
 
 Transactionはユーザからリクエストを受けたChainがその内容を検証し、指定されたChainに対してContract呼び出しリクエストを含むPacketを送信することで開始される。ユーザのTransaction開始のリクエストを受け取るChainをInitiator chainと呼ぶ。Initiator chainは、リクエストを受け取ると、各Accountによる承認を処理し、その後Atomic commitのフローを指定された形式に従い実行する。
 
-例えば、Atomic commitとしてTwo phase commitを実行する場合、Initiator chainが2PCのCoordinatorの役割を担い、ユーザのリクエストに含まれる各ChainのContract関数の呼び出し、およびその結果を管理し、最終的なCommitの可否を決定し、その決定を受け取った各Participant chainsがCommitもしくはAbortを行う。
+例えば、Atomic commitとしてTwo phase commitを実行する場合、Initiator chainが2PCのCoordinatorの役割を担う。各Chain上のContract関数の呼び出しおよびその結果を取得し、最終的なCommitの可否を決定する。最終的にその決定を受け取った各Participant chainsはCommitもしくはAbortを行う。
 
 ## Account
 
@@ -68,7 +68,7 @@ message ContractTransaction {
 
 - `contract_transactions`: 各Chain上の[Contract Module](./overview#contract-module)を実行するContract Transactionの配列。
 - `commit_protocol`: トランザクションのコミットプロトコル
-- `timeout_height`, `timeout_timestamp`: トランザクションの処理のタイムアウトを指定。これを過ぎた場合、実行されない。
+- `timeout_height`, `timeout_timestamp`: トランザクションのタイムアウトを指定。これを過ぎた場合、実行されない。
 
 また、Contract Transactionは、次の要素から構成される:
 
