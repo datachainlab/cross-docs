@@ -100,9 +100,9 @@ Cross-chainのContract関数呼び出しには、以下の点を考慮する必�
 
 LinkerはLinkが指すContract Transaction(calleeTx)と、Linkを参照するContract Transaction(callerTx)について以下の処理を行う:
 
-1. calleeTxの`call_info`と`signers`から構成されるものをキーとし、`return_value`を値とする`RVObject`を生成する
-2. LinkerはcalleeTxの`cross_chain_channel`をcallerが利用可能なIBC Channelに解決し、それを`RVObject`にセットする
-3. TxInitiatorは、callerTxの`ContractTransaction`と`RVObject`から`ResolvedContractTransaction`を生成する。`ResolvedContractTransaction`は以下のような定義となる。
+1. calleeTxの`call_info`と`signers`から構成されるものをキーとし、`return_value`を値とする`CallResult`を生成する
+2. LinkerはcalleeTxの`cross_chain_channel`をcallerが利用可能なIBC Channelに解決し、それを`CallResult`にセットする
+3. TxInitiatorは、callerTxの`ContractTransaction`と`CallResult`から`ResolvedContractTransaction`を生成する。`ResolvedContractTransaction`は以下のような定義となる。
 
 ```proto
 message ResolvedContractTransaction {
@@ -110,7 +110,7 @@ message ResolvedContractTransaction {
   repeated cross.core.auth.Account signers = 2;
   bytes call_info = 3;
   ReturnValue return_value = 4;
-  repeated google.protobuf.Any objects = 5; // List of RVObject
+  repeated google.protobuf.Any call_results = 5; // List of CallResult
 }
 ```
 
@@ -181,7 +181,7 @@ type AuthExtensionVerifier interface {
 各Chain上で次のようにContractは処理される:
 
 - `ResolvedContractTransaction`を処理し、[Contract Module](./overview#contract-module)で定義されるContract関数を呼び出す
-- ContractがCross-chain callsを含む場合、`Call`の引数`ChannelInfo`と`ContractCallInfo`が`ResolvedContractTransaction`の`RVObject`の値と一致することを検証する
+- ContractがCross-chain callsを含む場合、`Call`の引数`ChannelInfo`と`ContractCallInfo`が対応する`ResolvedContractTransaction`の`CallResult`の値と一致することを検証する
 - Contractの実行後、コミットフローに応じて[Contract Manager](./overview#contract-manager)のPrecommitもしくはCommitImmediatelyを呼び出し状態を保存する
 
 Commitフローの種類にかかわらず、`MsgInitiateTx`に含まれる全てのContract Transactionの実行が成功した場合のみ更新はコミットされ、いずれかが失敗した場合は全てのContract Transactionは中止されることが保証されている。
