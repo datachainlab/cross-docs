@@ -27,7 +27,7 @@ Cross Frameworkでは、異なるChain間でSmart contractの機能や状態を�
 // ChainA
 func Deposit(store Store, from Account, amount uint64) bool {
     balance := store.GetInt(from)
-    if (balance <= amount) {
+    if (balance < amount) {
         return false
     }
     store.SetInt(fromID, balance-amount)
