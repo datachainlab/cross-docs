@@ -89,7 +89,7 @@ message ContractTransaction {
 
 ## Link
 
-Linkは、[Cross-chain calls](./02-smart-contract.md)を行うContract Transaction間の関連付けを行う機能である。LinkerによりLinkは`MsgInitiateTx`の提出時にInitiator Chainにより呼び出し結果に解決される。
+Linkは、[Cross-chain calls](./02-smart-contract.md)を行うContract Transaction間の関連付けを行う機能である。Initiator Chainは`MsgInitiateTx`の提出時にLinkerを用いて各Linkを対応する呼び出し結果へ解決する。
 
 Cross-chainのContract関数呼び出しには、以下の点を考慮する必要がある:
 
