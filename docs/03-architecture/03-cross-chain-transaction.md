@@ -17,7 +17,7 @@ Transactionはユーザからリクエストを受けたChainがその内容を�
 
 アカウントとは、ブロックチェーンに対してトランザクションを送信できるエンティティである。通常、それらはあるブロックチェーン内で一意に識別されることが求められる。また、一般的にあるチェーンでのアカウントは別チェーン上のアカウントとの相互運用性がない。これは、ブロックチェーンごとにアカウントの概念や表現方式が異なるためである。
 
-Cross-chain上のコントラクトの認証において、任意のブロックチェーン上のアカウントを利用できることにより、多様な認証方式をサポートさせることができようになる。Cross Frameworkでは、Accountは各ブロックチェーン上でのユーザの識別子を示す`ID`と`AuthType`と呼ばれる認証情報から構成される。これにより、異なるチェーン上のアカウントを識別可能にしている。
+Cross-chain上のコントラクトの認証において、任意のブロックチェーン上のアカウントを利用できるようにすることで、多様な認証方式をサポートできるようになる。Cross Frameworkでは、Accountは各ブロックチェーン上でのユーザの識別子を示す`ID`と`AuthType`と呼ばれる認証情報から構成される。これにより、異なるチェーン上のアカウントを識別可能にしている。
 なお、Cross Frameworkがサポートする各認証方式については[こちら](#authentication)を参照。
 
 ```proto
@@ -99,10 +99,10 @@ Cross-chainのContract関数呼び出しには、以下の点を考慮する必�
 
 1.は、[State store](./05-state-store.md)のLocking mechanismで直列化可能性が保証され、2.は、[Atomic commit protocol](./04-atomic-commit-protocol.md)により保証される。Linkは、3の要素を実現するための機能であり、Transaction提出者はCross-chain callを行う`ContractTransaction`の`links`として参照先のChainを指定することで関連付けることが可能となる。なお、Linkは、`contract_transactions`内の参照先の`ContractTransaction`のインデックスとして表される。
 
-LinkerはLinkが指すContract Transaction(calleeTx)と、Linkを参照するContract Transaction(callerTx)について以下の処理を行う:
+Linkが指すContract Transaction(calleeTx)と、Linkを参照するContract Transaction(callerTx)は以下のように処理される:
 
-1. calleeTxの`call_info`と`signers`から構成されるものをキーとし、`return_value`を値とする`CallResult`を生成する
-2. LinkerはcalleeTxの`cross_chain_channel`をcallerが利用可能なIBC Channelに解決し、それを`CallResult`にセットする
+1. Linkerは、calleeTxの`call_info`と`signers`から構成されるものをキーとし、`return_value`を値とする`CallResult`を生成する
+2. Linkerは、calleeTxの`cross_chain_channel`をcallerが利用可能なIBC Channelに解決し、それを`CallResult`にセットする
 3. TxInitiatorは、callerTxの`ContractTransaction`と`CallResult`から`ResolvedContractTransaction`を生成する。`ResolvedContractTransaction`は以下のような定義となる。
 
 ```proto
@@ -123,7 +123,7 @@ Transactionの認証は、[Authenticator](./overview#authenticator)により行�
 
 Transactionの認証は、`contract_transactions`の各Contract Transactionの`signers`に指定されたAccountにより行われる。また、認証が完了するまで実行はブロックされる。
 
-認証方式は各Accountの`AuthType`で指定された方式を満たす必要がある。各方式ごとに対応するMsgが定義されており、対象のTxIDを指定し、決められた方式を満たすことで承認が可能である。
+認証は各Accountの`AuthType`で指定された方式を満たす必要がある。各方式ごとに対応するMsgが定義されており、対象のTxIDを指定し、決められた方式を満たすことで承認が可能である。
 
 現在、認証方式として、`SignTx`, `IBCSignTx`, `ExtSignTx`がサポートされている。各方式とそれらに対応するMsgの定義を以下で述べる。
 
@@ -142,7 +142,6 @@ message MsgSignTx {
 
 IBCSignTxは、Transactionが提出されたチェーンとIBC Channelで接続されたチェーンの認証方式にしたがって認証を行う方式である。これは、`AuthMode`が`AUTH_MODE_CHANNEL`で指定されたAccountの認証が可能である。なお、そのAccountは、`option`として認証を許可するIBC Channelの情報を保持する必要がある。
 
-
 ```proto
 message MsgIBCSignTx {
   google.protobuf.Any cross_chain_channel = 1;
@@ -158,7 +157,6 @@ message MsgIBCSignTx {
 ExtSignTxは、開発者定義の認証式にしたがって認証を行う方式である。これは、`AuthMode`が`AUTH_MODE_EXTENSION`で指定されたAccountの認証が可能である。
 
 これに対応するAccountは`option`としてAuthExtensionVerifierを実装するproto.Messageを保持する必要がある。
-
 
 ```proto
 message MsgExtSignTx {
