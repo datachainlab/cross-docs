@@ -12,9 +12,9 @@ Cross Frameworkでは、異なるChain間でSmart contractの機能や状態を�
 
 これにより、より複雑な状態を持つアセットのChain間転送やスワップを実現可能となることに加え、新しくこのようなプロトコルを開発者が実装する場合にも安全に最小限のロジックの開発に集中できるようになる。
 
-また、このようなSmart contractを実現するために([Cross-chain Transactions](./02-cross-chain-transaction.md))をサポートしている。これは複数の異なるブロックチェーン間で行う分散トランザクションを指す。データベースの分散トランザクションと同じく、Cross-chain Transactionsは、ACID特性で定義されているようなトランザクション処理の信頼性を保証する必要がある。Cross FrameworkではContractのAtomicな実行をサポートするために[複数のアトミックコミットプロトコル](./03-atomic-commit-protocol.md)を実装している。
+また、このようなSmart contractを実現するために([Cross-chain Transactions](./03-cross-chain-transaction.md))をサポートしている。これは複数の異なるブロックチェーン間で行う分散トランザクションを指す。データベースの分散トランザクションと同じく、Cross-chain Transactionsは、ACID特性で定義されているようなトランザクション処理の信頼性を保証する必要がある。Cross FrameworkではContractのAtomicな実行をサポートするために[複数のアトミックコミットプロトコル](./04-atomic-commit-protocol.md)を実装している。
 
-開発者は、[Contract Module](./overview#contract-module)を実装することでこのようなContractを開発できる。
+開発者は、[Contract Module](./01-overview.md#contract-module)を実装することでこのようなContractを開発できる。
 
 ## Cross-chain calls
 
@@ -52,4 +52,4 @@ func Peg(store Store, to Account, amount uint64) {
 }
 ```
 
-Deposit関数は単に残高をコントラクトアドレスにdepositするだけの関数であり、成功したかどうかの真偽値を返す。一方、Peg関数はChainA上のDeposit関数を`Call`で呼び出し、その戻り値を取得している。InitiateTx時に2つの関数呼び出しをLinkさせることでこのようなコントラクト間呼び出しが可能になる。なお、InitiateTxやLinkの仕様については[02](./cross-chain-transaction#link)で述べる。
+Deposit関数は単に残高をコントラクトアドレスにdepositするだけの関数であり、成功したかどうかの真偽値を返す。一方、Peg関数はChainA上のDeposit関数を`Call`で呼び出し、その戻り値を取得している。InitiateTx時に2つの関数呼び出しをLinkさせることでこのようなコントラクト間呼び出しが可能になる。なお、InitiateTxやLinkの仕様については[03](./03-cross-chain-transaction.md#link)で述べる。
