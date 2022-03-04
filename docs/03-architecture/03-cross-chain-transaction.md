@@ -11,13 +11,14 @@ Cross Frameworkでは、複数のAtomic commit protocolをサポートし、ま�
 
 Transactionはユーザからリクエストを受けたChainがその内容を検証し、指定されたChainに対してContract呼び出しリクエストを含むPacketを送信することで開始される。ユーザのTransaction開始のリクエストを受け取るChainをInitiator chainと呼ぶ。Initiator chainは、リクエストを受け取ると、各Accountによる承認を処理し、その後Atomic commitのフローを指定された形式に従い実行する。
 
-例えば、Atomic commitとしてTwo phase commitを実行する場合、Initiator chainが2PCのCoordinatorの役割を担う。各Chain上のContract関数の呼び出しおよびその結果を取得し、最終的なCommitの可否を決定する。最終的にその決定を受け取った各Participant chainsはCommitもしくはAbortを行う。
+例えば、Atomic commitとしてTwo phase commitを実行する場合、Initiator chainがCoordinatorの役割を担う。最初にCoordinatorは各Participant chainにContract関数の実行を要求する。次に、Coordinatorは、各Participant chainの関数の呼び出し結果を取得し、最終的なCommitの可否を決定する。最終的にその決定を受け取った各Participant chainsはCommitもしくはAbortを行う。
 
 ## Account
 
-通常、あるチェーンでのアカウントが別チェーン上のアカウントと同一の識別子を持つ場合、Cross-chain上で識別できない、という課題がある。これは、ブロックチェーンごとにアカウントの概念や表現方式が異なるためである。
+アカウントとは、ブロックチェーンに対してトランザクションを送信できるエンティティである。通常、それらはあるブロックチェーン内で一意に識別されることが求められる。また、一般的にあるチェーンでのアカウントは別チェーン上のアカウントとの相互運用性がない。これは、ブロックチェーンごとにアカウントの概念や表現方式が異なるためである。
 
-そこで、Cross Frameworkでは、各ブロックチェーン上でのユーザの識別子と`AuthType`という認証方式の情報を含むAccountを定義している。
+Cross-chain上のコントラクトの認証において、任意のブロックチェーン上のアカウントを利用できるようにすることで、多様な認証方式をサポートできるようになる。Cross Frameworkでは、Accountは各ブロックチェーン上でのユーザの識別子を示す`ID`と`AuthType`と呼ばれる認証情報から構成される。これにより、異なるチェーン上のアカウントを識別可能にしている。
+なお、Cross Frameworkがサポートする各認証方式については[こちら](#authentication)を参照。
 
 ```proto
 message Account {
@@ -66,7 +67,7 @@ message ContractTransaction {
 
 `MsgInitiateTx`は、主に次の要素から構成される:
 
-- `contract_transactions`: 各Chain上の[Contract Module](./overview#contract-module)を実行するContract Transactionの配列。
+- `contract_transactions`: 各Chain上の[Contract Module](./01-overview.md#contract-module)を実行するContract Transactionの配列。
 - `commit_protocol`: トランザクションのコミットプロトコル
 - `timeout_height`, `timeout_timestamp`: トランザクションのタイムアウトを指定。これを過ぎた場合、実行されない。
 
@@ -74,7 +75,7 @@ message ContractTransaction {
 
 - `cross_chain_channel`: Initiator Chainと実行対象のコントラクトが存在するChainとのIBC Channel
 - `signers`: 認証が必要な`Account`の配列
-- `callInfo`: Contractの識別子、関数名、引数などを含む呼び出し情報。フォーマットは[Contract Module](./overview#contract-module)の仕様で定められる
+- `callInfo`: Contractの識別子、関数名、引数などを含む呼び出し情報。フォーマットは[Contract Module](./01-overview.md#contract-module)の仕様で定められる
 - `return_value`: このContractの実行により期待される戻り値(オプション)
 - `links`: このContractの実行時に参照される他のContract呼び出し結果(オプション)。詳細は[Link](#link)の項を参照
 
@@ -88,7 +89,7 @@ message ContractTransaction {
 
 ## Link
 
-Linkは、[Cross-chain calls](./02-smart-contract.md)を行うContract Transaction間の関連付けを行う機能である。LinkerによりLinkは`MsgInitiateTx`の提出時にInitiator Chainにより呼び出し結果に解決される。
+Linkは、[Cross-chain calls](./02-smart-contract.md)を行うContract Transaction間の関連付けを行う機能である。Initiator Chainは`MsgInitiateTx`の提出時にLinkerを用いて各Linkを対応する呼び出し結果へ解決する。
 
 Cross-chainのContract関数呼び出しには、以下の点を考慮する必要がある:
 
@@ -98,10 +99,10 @@ Cross-chainのContract関数呼び出しには、以下の点を考慮する必�
 
 1.は、[State store](./05-state-store.md)のLocking mechanismで直列化可能性が保証され、2.は、[Atomic commit protocol](./04-atomic-commit-protocol.md)により保証される。Linkは、3の要素を実現するための機能であり、Transaction提出者はCross-chain callを行う`ContractTransaction`の`links`として参照先のChainを指定することで関連付けることが可能となる。なお、Linkは、`contract_transactions`内の参照先の`ContractTransaction`のインデックスとして表される。
 
-LinkerはLinkが指すContract Transaction(calleeTx)と、Linkを参照するContract Transaction(callerTx)について以下の処理を行う:
+Linkが指すContract Transaction(calleeTx)と、Linkを参照するContract Transaction(callerTx)は以下のように処理される:
 
-1. calleeTxの`call_info`と`signers`から構成されるものをキーとし、`return_value`を値とする`CallResult`を生成する
-2. LinkerはcalleeTxの`cross_chain_channel`をcallerが利用可能なIBC Channelに解決し、それを`CallResult`にセットする
+1. Linkerは、calleeTxの`call_info`と`signers`から構成されるものをキーとし、`return_value`を値とする`CallResult`を生成する
+2. Linkerは、calleeTxの`cross_chain_channel`をcallerが利用可能なIBC Channelに解決し、それを`CallResult`にセットする
 3. TxInitiatorは、callerTxの`ContractTransaction`と`CallResult`から`ResolvedContractTransaction`を生成する。`ResolvedContractTransaction`は以下のような定義となる。
 
 ```proto
@@ -118,11 +119,11 @@ TxInitiatorは、Linkの解決後、Transactionの[認証処理](#authentication
 
 ## Authentication
 
-Transactionの認証は、[Authenticator](./overview#authenticator)により行われる。Authenticatorは、Initiator Chainでの認証方式のほか、IBC Channelで接続される他チェーンでの認証方式を提供する。
+Transactionの認証は、[Authenticator](./01-overview.md#authenticator)により行われる。Authenticatorは、Initiator Chainでの認証方式のほか、IBC Channelで接続される他チェーンでの認証方式を提供する。
 
 Transactionの認証は、`contract_transactions`の各Contract Transactionの`signers`に指定されたAccountにより行われる。また、認証が完了するまで実行はブロックされる。
 
-認証方式は各Accountの`AuthType`で指定された方式を満たす必要がある。各方式ごとに対応するMsgが定義されており、対象のTxIDを指定し、決められた方式を満たすことで承認が可能である。
+認証は各Accountの`AuthType`で指定された方式を満たす必要がある。各方式ごとに対応するMsgが定義されており、対象のTxIDを指定し、決められた方式を満たすことで承認が可能である。
 
 現在、認証方式として、`SignTx`, `IBCSignTx`, `ExtSignTx`がサポートされている。各方式とそれらに対応するMsgの定義を以下で述べる。
 
@@ -141,7 +142,6 @@ message MsgSignTx {
 
 IBCSignTxは、Transactionが提出されたチェーンとIBC Channelで接続されたチェーンの認証方式にしたがって認証を行う方式である。これは、`AuthMode`が`AUTH_MODE_CHANNEL`で指定されたAccountの認証が可能である。なお、そのAccountは、`option`として認証を許可するIBC Channelの情報を保持する必要がある。
 
-
 ```proto
 message MsgIBCSignTx {
   google.protobuf.Any cross_chain_channel = 1;
@@ -157,7 +157,6 @@ message MsgIBCSignTx {
 ExtSignTxは、開発者定義の認証式にしたがって認証を行う方式である。これは、`AuthMode`が`AUTH_MODE_EXTENSION`で指定されたAccountの認証が可能である。
 
 これに対応するAccountは`option`としてAuthExtensionVerifierを実装するproto.Messageを保持する必要がある。
-
 
 ```proto
 message MsgExtSignTx {
@@ -180,8 +179,8 @@ type AuthExtensionVerifier interface {
 
 各Chain上で次のようにContractは処理される:
 
-- `ResolvedContractTransaction`を処理し、[Contract Module](./overview#contract-module)で定義されるContract関数を呼び出す
+- `ResolvedContractTransaction`を処理し、[Contract Module](./01-overview.md#contract-module)で定義されるContract関数を呼び出す
 - ContractがCross-chain callsを含む場合、`Call`の引数`ChannelInfo`と`ContractCallInfo`が対応する`ResolvedContractTransaction`の`CallResult`の値と一致することを検証する
-- Contractの実行後、コミットフローに応じて[Contract Manager](./overview#contract-manager)のPrecommitもしくはCommitImmediatelyを呼び出し状態を保存する
+- Contractの実行後、コミットフローに応じて[Contract Manager](./01-overview.md#contract-manager)のPrecommitもしくはCommitImmediatelyを呼び出し状態を保存する
 
 Commitフローの種類にかかわらず、`MsgInitiateTx`に含まれる全てのContract Transactionの実行が成功した場合のみ更新はコミットされ、いずれかが失敗した場合は全てのContract Transactionは中止されることが保証されている。
