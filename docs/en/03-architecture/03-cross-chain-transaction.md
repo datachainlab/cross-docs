@@ -67,7 +67,7 @@ message ContractTransaction {
 
 `MsgInitiateTx` consists mainly of the following elements:
 
-- `contract_transactions`: an array of Contract Transactions that execute [Contract Module](./overview#contract-module) on each chain
+- `contract_transactions`: an array of Contract Transactions that execute [Contract Module](./01-overview.md#contract-module) on each chain
 - `commit_protocol`: The commit protocol for the transaction
 - `timeout_height`, `timeout_timestamp`: Specify the timeout for the transaction. The transaction will not be executed if the timeout is exceeded
 
@@ -75,7 +75,7 @@ A Contract Transaction consists of the following elements:
 
 - `cross_chain_channel`: The IBC channel between the initiator chain and the chain where the contract to be executed exists
 - `signers`: An array of `Accounts` that need to be authenticated
-- `callInfo`: Call information including contract identifier, function name, and arguments. The format is [Contract Module](./overview#contract-module) specification
+- `callInfo`: Call information including contract identifier, function name, and arguments. The format is [Contract Module](./01-overview.md#contract-module) specification
 - `return_value`: The return value expected from the execution of this contract (optional)
 - `links`: Optional results of other contract calls that will be referenced when this contract is executed. See the [Link](#link) section for details
 
@@ -119,7 +119,7 @@ After resolving the link, the TxInitiator performs the [authentication process](
 
 ## Authentication
 
-Transaction authentication is performed by the [Authenticator](./overview#authenticator). The Authenticator provides authentication methods for the initiator chain and other chains connected by the IBC channel.
+Transaction authentication is performed by the [Authenticator](./01-overview.md#authenticator). The Authenticator provides authentication methods for the initiator chain and other chains connected by the IBC channel.
 
 Authentication of a transaction is performed by the accounts specified in `signers` of each contract transaction in `contract_transactions`. The execution is blocked until the authentication is completed.
 
@@ -179,7 +179,7 @@ After all authentication of the transaction is completed, `Tx Runner` starts the
 
 On each chain, a contract is processed as follows:
 
-- Process a `ResolvedContractTransaction` and returns it to [Contract Module](./overview#contract-module)
+- Process a `ResolvedContractTransaction` and returns it to [Contract Module](./01-overview.md#contract-module)
 - If the contract contains cross-chain calls, verify that the arguments `ChannelInfo` and `ContractCallInfo` of the `Call` match the values of `CallResult` of the corresponding `ResolvedContractTransaction`
 - After the contract is executed, call the Contract Manager's Precommit or CommitImmediately depending on the commit flow to save the status
 

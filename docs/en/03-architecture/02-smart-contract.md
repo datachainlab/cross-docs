@@ -14,11 +14,11 @@ Many blockchains, such as Ethereum and Hyperledger fabric, only support transact
 
 In Cross Framework, it enables the development of a smart contract (C-chain smart contract) that invokes and references smart contracts' functions and states between different chains. It is also possible to invoke two independent contracts atomically. Thus, developers will only focus on developing business logic.
 
-The framework also supports ([Cross-chain Transactions](./02-cross-chain-transaction.md)) to realize Cross-chain smart contract. It means distributed transactions between multiple different blockchains. Similar to distributed transactions in databases, Cross-chain Transactions need to guarantee transaction processing reliability as defined by the ACID property.
+The framework also supports ([Cross-chain Transactions](./03-cross-chain-transaction.md)) to realize Cross-chain smart contract. It means distributed transactions between multiple different blockchains. Similar to distributed transactions in databases, Cross-chain Transactions need to guarantee transaction processing reliability as defined by the ACID property.
 
-To realize it, Cross Framework implements [multiple atomic commit protocols](./03-atomic-commit-protocol.md) to support the atomic execution of contracts.
+To realize it, Cross Framework implements [multiple atomic commit protocols](./04-atomic-commit-protocol.md) to support the atomic execution of contracts.
 
-Developers can develop such a contract by implementing the [Contract Module](./overview#contract-module).
+Developers can develop such a contract by implementing the [Contract Module](./01-overview.md#contract-module).
 
 ## Cross-chain calls
 
@@ -56,4 +56,4 @@ func Peg(store Store, to Account, amount uint64) {
 }
 ```
 
-Deposit function deposits the balance to the contract address and returns a boolean value of whether it is successful or not. Peg function calls the Deposit function on chainA with `Call` and gets its return value. Linking the two function calls in InitiateTx process enables such Cross-chain call. For more information on the specifications of InitiateTx and Link, please refer to [02](./cross-chain-transaction#link).
+Deposit function deposits the balance to the contract address and returns a boolean value of whether it is successful or not. Peg function calls the Deposit function on chainA with `Call` and gets its return value. Linking the two function calls in InitiateTx process enables such Cross-chain call. For more information on the specifications of InitiateTx and Link, please refer to [03](./03-cross-chain-transaction.md#link).

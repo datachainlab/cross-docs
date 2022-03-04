@@ -67,7 +67,7 @@ message ContractTransaction {
 
 `MsgInitiateTx`は、主に次の要素から構成される:
 
-- `contract_transactions`: 各Chain上の[Contract Module](./overview#contract-module)を実行するContract Transactionの配列。
+- `contract_transactions`: 各Chain上の[Contract Module](./01-overview.md#contract-module)を実行するContract Transactionの配列。
 - `commit_protocol`: トランザクションのコミットプロトコル
 - `timeout_height`, `timeout_timestamp`: トランザクションのタイムアウトを指定。これを過ぎた場合、実行されない。
 
@@ -75,7 +75,7 @@ message ContractTransaction {
 
 - `cross_chain_channel`: Initiator Chainと実行対象のコントラクトが存在するChainとのIBC Channel
 - `signers`: 認証が必要な`Account`の配列
-- `callInfo`: Contractの識別子、関数名、引数などを含む呼び出し情報。フォーマットは[Contract Module](./overview#contract-module)の仕様で定められる
+- `callInfo`: Contractの識別子、関数名、引数などを含む呼び出し情報。フォーマットは[Contract Module](./01-overview.md#contract-module)の仕様で定められる
 - `return_value`: このContractの実行により期待される戻り値(オプション)
 - `links`: このContractの実行時に参照される他のContract呼び出し結果(オプション)。詳細は[Link](#link)の項を参照
 
@@ -119,7 +119,7 @@ TxInitiatorは、Linkの解決後、Transactionの[認証処理](#authentication
 
 ## Authentication
 
-Transactionの認証は、[Authenticator](./overview#authenticator)により行われる。Authenticatorは、Initiator Chainでの認証方式のほか、IBC Channelで接続される他チェーンでの認証方式を提供する。
+Transactionの認証は、[Authenticator](./01-overview.md#authenticator)により行われる。Authenticatorは、Initiator Chainでの認証方式のほか、IBC Channelで接続される他チェーンでの認証方式を提供する。
 
 Transactionの認証は、`contract_transactions`の各Contract Transactionの`signers`に指定されたAccountにより行われる。また、認証が完了するまで実行はブロックされる。
 
@@ -179,8 +179,8 @@ type AuthExtensionVerifier interface {
 
 各Chain上で次のようにContractは処理される:
 
-- `ResolvedContractTransaction`を処理し、[Contract Module](./overview#contract-module)で定義されるContract関数を呼び出す
+- `ResolvedContractTransaction`を処理し、[Contract Module](./01-overview.md#contract-module)で定義されるContract関数を呼び出す
 - ContractがCross-chain callsを含む場合、`Call`の引数`ChannelInfo`と`ContractCallInfo`が対応する`ResolvedContractTransaction`の`CallResult`の値と一致することを検証する
-- Contractの実行後、コミットフローに応じて[Contract Manager](./overview#contract-manager)のPrecommitもしくはCommitImmediatelyを呼び出し状態を保存する
+- Contractの実行後、コミットフローに応じて[Contract Manager](./01-overview.md#contract-manager)のPrecommitもしくはCommitImmediatelyを呼び出し状態を保存する
 
 Commitフローの種類にかかわらず、`MsgInitiateTx`に含まれる全てのContract Transactionの実行が成功した場合のみ更新はコミットされ、いずれかが失敗した場合は全てのContract Transactionは中止されることが保証されている。
