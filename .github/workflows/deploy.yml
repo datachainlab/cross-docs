@@ -1,9 +1,6 @@
 name: Deploy to Github Pages
 
 on:
-  # TODO remove after review and before merge
-  pull_request:
-    branches: [main]
   push:
     branches: [main]
 
