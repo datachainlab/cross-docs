@@ -5,24 +5,28 @@ id: smart-contract
 
 # Smart Contract
 
-Smart contractとは、Blockchain上で実行可能なプログラムである。それらは状態をもち、提供される機能は関数として公開され、定められた条件に従い実行可能である。ユーザが生成したTransactionによって実行され、状態の更新を行う。EthereumやHyperledger fabricなど多くのブロックチェーンにおいて、単一のChain or Channelの処理を行うトランザクションのみがサポートされており、他のブロックチェーンとのInteroperabilityは考慮されていないものが多い。
+Smart contract is a program that can be executed on Blockchain. They have a state, and the functions they provide are exposed as functions that can be executed according to defined conditions. It can also be executed by a transaction is created by a user.
+
+Many blockchains, such as Ethereum and Hyperledger fabric, only support transactions that process a single chain or channel and often do not have interoperability with other blockchains.
+
+
 ## Cross-chain smart contract
 
-Cross Frameworkでは、異なるChain間でSmart contractの機能や状態を相互に呼び出し、参照を行うsmart contract(Cross-chain smart contract)の開発が可能である。また、2つの独立したContractの呼び出しをアトミックに実行することも可能である。
+In Cross Framework, it enables the development of a smart contract (C-chain smart contract) that invokes and references smart contracts' functions and states between different chains. It is also possible to invoke two independent contracts atomically. Thus, developers will only focus on developing business logic.
 
-これにより、より複雑な状態を持つアセットのChain間転送やスワップを実現可能となることに加え、新しくこのようなプロトコルを開発者が実装する場合にも安全に最小限のロジックの開発に集中できるようになる。
+The framework also supports ([Cross-chain Transactions](./03-cross-chain-transaction.md)) to realize Cross-chain smart contract. It means distributed transactions between multiple different blockchains. Similar to distributed transactions in databases, Cross-chain Transactions need to guarantee transaction processing reliability as defined by the ACID property.
 
-また、このようなSmart contractを実現するために([Cross-chain Transactions](./03-cross-chain-transaction.md))をサポートしている。これは複数の異なるブロックチェーン間で行う分散トランザクションを指す。データベースの分散トランザクションと同じく、Cross-chain Transactionsは、ACID特性で定義されているようなトランザクション処理の信頼性を保証する必要がある。Cross FrameworkではContractのAtomicな実行をサポートするために[複数のアトミックコミットプロトコル](./04-atomic-commit-protocol.md)を実装している。
+To realize it, Cross Framework implements [multiple atomic commit protocols](./04-atomic-commit-protocol.md) to support the atomic execution of contracts.
 
-開発者は、[Contract Module](./01-overview.md#contract-module)を実装することでこのようなContractを開発できる。
+Developers can develop such a contract by implementing the [Contract Module](./01-overview.md#contract-module).
 
 ## Cross-chain calls
 
-各Chainに実装されたContract関数は、それぞれ別のChainのContract関数を呼び出し可能である。これをCross-chain callsと呼んでいる。一方のChainのContractが他方のContractの呼び出しの結果を受け取ることが可能である。
+A contract function implemented in a chain can call a contract function o in another chain. It is called cross-chain calls. It allows one chain's contract to receive the results of the other chain's contract calls.
 
-これにより、Chain間の資産の移転などのより複雑なプロトコルを含むContractが開発可能である。
+It enables the development of contracts that include more complex logics such as conditional asset transfer between chains.
 
-例えば、Chain A上のAliceがChain B上のBobの残高にトークン転送するコントラクトは次のようになる。簡単のため、Chain AとB上のトークンは等価である仮定をおく。
+For example, a contract in which Alice on chain A transfers a token to Bob's balance on chain B would be as follows: (for simplicity, let us assume that the tokens on chain A and B are equivalent)
 
 ```go
 // ChainA
@@ -52,4 +56,4 @@ func Peg(store Store, to Account, amount uint64) {
 }
 ```
 
-Deposit関数は単に残高をコントラクトアドレスにdepositするだけの関数であり、成功したかどうかの真偽値を返す。一方、Peg関数はChainA上のDeposit関数を`Call`で呼び出し、その戻り値を取得している。InitiateTx時に2つの関数呼び出しをLinkさせることでこのようなコントラクト間呼び出しが可能になる。なお、InitiateTxやLinkの仕様については[03](./03-cross-chain-transaction.md#link)で述べる。
+Deposit function deposits the balance to the contract address and returns a boolean value of whether it is successful or not. Peg function calls the Deposit function on chainA with `Call` and gets its return value. Linking the two function calls in InitiateTx process enables such Cross-chain call. For more information on the specifications of InitiateTx and Link, please refer to [03](./03-cross-chain-transaction.md#link).

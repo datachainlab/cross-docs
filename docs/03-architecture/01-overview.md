@@ -5,41 +5,41 @@ id: overview
 
 # Overivew
 
-Cross Frameworkは次のようなコンポーネントから構成される。
+Cross Framework is composed of the following components:
 
 ![Fig. Architecture](https://user-images.githubusercontent.com/1170428/136157600-5f459aa6-a0d3-44df-9d16-31da4d4d1d4e.png)
 
 ### Tx Initiator
 
-Tx InitiatorはClientから提出されたTransaction(MsgInitiateTx)を受け付ける。提出後、基本的なバリデーションの後に、Cross-chain callsのためにContract Transaction間の[Link処理](./cross-chain-transaction#link)を行う。
+Tx Initiator accepts a transaction (MsgInitiateTx) submitted by an actor. After validating the transaction, it performs [Link processing](./cross-chain-transaction#link) between Contract Transactions for cross-chain calls.
 
-次に、提出トランザクションごとにユニークなTxIDを生成し、Transactionに含まれるContract Transactionの認証に必要なAccountを取り出し、Authenticatorを呼び出す。トランザクションは、Authenticatorにより全ての必要な認証が完了するまでブロックされる。完了後、Tx Runnerによりトランザクションは開始される。
+It then generates a unique TxID for each submitted transaction, retrieves the Account required to authenticate the Contract Transaction contained in the transaction, and calls Authenticator. The transaction is blocked until the Authenticator completes all necessary authentications. After completion, Tx Runner initiates the transaction.
 
-Transactionの提出の詳細は[Inititate Transaction](./cross-chain-transaction#initiate-transaction)でも述べられる。
+The details of submitting a Transaction are described in [Initiate Transaction](./cross-chain-transaction#initiate-transaction).
 
 ### Authenticator
 
-Authenticatorはトランザクションの認証処理の提供とその状態の管理を行う。認証方式は、実行チェーン上の認証の他、IBCを用いた他チェーン上での方式など複数サポートされる。
+Authenticator provides a transaction authentication process and manages its status. Several authentication methods are supported, including authentication on the execution chain and authentication on other chains using IBC.
 
-各認証処理はトランザクションの提出チェーンで同期的に行われるだけでなく、非同期での処理や別チェーンからのPacketにより処理される場合がある。
+Each authentication process is not only performed synchronously in the transaction submission chain but may also be processed asynchronously or by a packet from another chain.
 
-そのため、認証時には対象のトランザクションを識別するためにTxIDを指定する必要がある。認証方式の詳細は[Authentication](./cross-chain-transaction#authentication)で述べる。
+Therefore, it is necessary to specify TxID to identify the target transaction at the authentication. The details of the authentication process are described in [Authentication](. /cross-chain-transaction#authentication).
 
 ### Tx Runner
 
-Tx Runnerは、Authenticatorにより認証が成功したトランザクションを実行する。トランザクションは複数チェーン上で実行されるため、それらをAtomicに実行できなければならない。そのため、[Atomic commit protocol](./03-architecture/04-atomic-commit-protocol.md)をサポートしている。e.g. Two-phase commit protocol, Simple commit protocol
+Tx Runner executes transactions that Authenticator has successfully authenticated. Since transactions are executed on multiple chains, they must be able to be executed atomically. For this reason, it supports the [Atomic commit protocol](. /03-architecture/04-atomic-commit-protocol.md). e.g. Two-phase commit protocol, Simple commit protocol
 
-TransactionがどのCommit protocolを用いるかは、`MsgInitiateTx`で指定された方式に従う。提出ChainはそのCommit protocolのcoordinatorとなり、他チェーンとIBC Channelを通してメッセージングを行う。そして、Commit or Abortの決定を行い、各参加者にその結果をリクエストする。
+A commit protocol that a Transaction uses depends on the method specified by `MsgInitiateTx`. The submitting chain is the coordinator of the commit protocol and communicates with other chains via IBC Channel. It decides whether to commit or abort and requests the result to each participant.
 
 ### Contract Manager
 
-Contract Managerは、Contractを実装するContract Moduleと[State Store](./05-state-store.md)を管理し、その状態変更を操作するAPIを実装する。これらのAPIは、Commit protocolのフローの状態に応じてTx Runnerにより呼び出される。
+Contract Manager manages Contract Module that implements a contract and [State Store](./05-state-store.md). It also provides API to commit and discard changes. These APIs are called by Tx Runner corresponding to the status of the commit protocol flow.
 
 ### Contract Module
 
-Contract Moduleは、Frameworkを利用する開発者が実装するModuleである。
+Contract Module defines a smart contract. It is implemented by the developer who uses the framework.
 
-開発者は以下のInterfaceを実装するModuleを実装する。
+A module must satisfy the following interfaces:
 
 ```go
 type ContractModule interface {
@@ -47,4 +47,4 @@ type ContractModule interface {
 }
 ```
 
-TxRunnerにより、呼び出し情報、認証情報とともに`OnContractCall`が呼ばれることでContractは実行される。Contractは一般的には、`signers`で指定されたAccountの認証方式が期待したものであることを確認する必要がある。Contract Moduleの実装例は[ここ](https://github.com/datachainlab/cross/blob/v0.2.0/simapp/samplemod/module.go)で確認できる。
+A contract is executed by TxRunner when `OnContractCall` is called with a call information and authentication information; A contract generally needs to validate that an authentication process of Account is specified in `signers`. You can find an example implementation of Contract Module [here](https://github.com/datachainlab/cross/blob/v0.2.0/simapp/samplemod/module.go).

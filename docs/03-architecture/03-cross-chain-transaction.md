@@ -5,20 +5,20 @@ id: cross-chain-transaction
 
 # Cross-chain Transaction
 
-Cross-chain Transactionは、IBC channelで接続されたChain間で実行される分散Transactionである。
+Cross-chain Transaction is a distributed transaction executed between chains connected by IBC channel.
 
-Cross Frameworkでは、複数のAtomic commit protocolをサポートし、また各Chainの状態のコミット、巻き戻し機能および並行制御のためのLock mechanismを提供するState storeを提供している。
+Cross Framework supports multiple atomic commit protocols and provides a state store that supports state commit, rollback, and concurrency control.
 
-Transactionはユーザからリクエストを受けたChainがその内容を検証し、指定されたChainに対してContract呼び出しリクエストを含むPacketを送信することで開始される。ユーザのTransaction開始のリクエストを受け取るChainをInitiator chainと呼ぶ。Initiator chainは、リクエストを受け取ると、各Accountによる承認を処理し、その後Atomic commitのフローを指定された形式に従い実行する。
+A chain that receives a request from a user verifies the contents of the request and sends a packet containing a contract invocation request to the specified chain to initiate a transaction. The chain that receives the user's request to initiate a transaction is called the initiator chain. Once the initiator chain receives a request, it processes the approval by each Account and then executes the Atomic commit flow according to the specified format.
 
-例えば、Atomic commitとしてTwo phase commitを実行する場合、Initiator chainがCoordinatorの役割を担う。最初にCoordinatorは各Participant chainにContract関数の実行を要求する。次に、Coordinatorは、各Participant chainの関数の呼び出し結果を取得し、最終的なCommitの可否を決定する。最終的にその決定を受け取った各Participant chainsはCommitもしくはAbortを行う。
+For example, the initiator chain acts as a coordinator when executing Two-phase commit. First, the coordinator requests each participant chain to execute the contract function. Next, the coordinator gets the result of each call and decides whether or not to commit. After receiving the final decision, each participant chain commits or aborts the change.
 
 ## Account
 
-アカウントとは、ブロックチェーンに対してトランザクションを送信できるエンティティである。通常、それらはあるブロックチェーン内で一意に識別されることが求められる。また、一般的にあるチェーンでのアカウントは別チェーン上のアカウントとの相互運用性がない。これは、ブロックチェーンごとにアカウントの概念や表現方式が異なるためである。
+An account is an entity that can send transactions to a blockchain. Typically, they are required to be uniquely identified within a given blockchain. Also, accounts in one chain are generally not interoperable with accounts in another chain because each blockchain has a different concept of account and a different representation scheme.
 
-Cross-chain上のコントラクトの認証において、任意のブロックチェーン上のアカウントを利用できるようにすることで、多様な認証方式をサポートできるようになる。Cross Frameworkでは、Accountは各ブロックチェーン上でのユーザの識別子を示す`ID`と`AuthType`と呼ばれる認証情報から構成される。これにより、異なるチェーン上のアカウントを識別可能にしている。
-なお、Cross Frameworkがサポートする各認証方式については[こちら](#authentication)を参照。
+Cross-chain contract authentication can support a variety of authentication methods by allowing accounts on any blockchain to be used. In Cross Framework, an account consists of an `ID`, which is an identifier of a user on each blockchain, and authentication information called `AuthType`. Thus, it is possible to identify accounts on different chains.
+See [here](#authentication) for information on the authentication methods supported by Cross Framework.
 
 ```proto
 message Account {
@@ -39,11 +39,11 @@ enum AuthMode {
 }
 ```
 
-`AuthMode`とは、認証方式を指す識別子であり、`option`とは`AuthMode`ごとに定義される認証情報である。`AUTH_MODE_CHANNEL`の場合はChannelの情報、`AUTH_MODE_EXTENSION`の場合はExtensionのprotobuf.Anyの定義が`option`に含まれる。Transactionの認証の詳細は[Authentication](#authentication)で述べる。
+`AuthMode` is an identifier that refers to the authentication method, and `option` is the authentication information defined for each `AuthMode`. For `AUTH_MODE_CHANNEL`, the `option` contains the Channel information, and for `AUTH_MODE_EXTENSION`, the definition of the Extension protobuf.Any. Details of transaction authentication are described in [Authentication](#authentication).
 
 ## Initiate Transaction
 
-Transactionを開始するために、ユーザは以下の`MsgInitiateTx`として定義されるトランザクションを作成し、Chainに提出する。`MsgInitiateTx`が提出されたChainをInitiator chainと呼ぶ。
+A user creates a transaction defined as `MsgInitiateTx` below and submits it to a chain to initiate a transaction. The chain to which `MsgInitiateTx` is submitted is called the initiator chain.
 
 ```protobuf
 message MsgInitiateTx {
@@ -65,45 +65,45 @@ message ContractTransaction {
 }
 ```
 
-`MsgInitiateTx`は、主に次の要素から構成される:
+`MsgInitiateTx` consists mainly of the following elements:
 
-- `contract_transactions`: 各Chain上の[Contract Module](./01-overview.md#contract-module)を実行するContract Transactionの配列。
-- `commit_protocol`: トランザクションのコミットプロトコル
-- `timeout_height`, `timeout_timestamp`: トランザクションのタイムアウトを指定。これを過ぎた場合、実行されない。
+- `contract_transactions`: an array of Contract Transactions that execute [Contract Module](./01-overview.md#contract-module) on each chain
+- `commit_protocol`: The commit protocol for the transaction
+- `timeout_height`, `timeout_timestamp`: Specify the timeout for the transaction. The transaction will not be executed if the timeout is exceeded
 
-また、Contract Transactionは、次の要素から構成される:
+A Contract Transaction consists of the following elements:
 
-- `cross_chain_channel`: Initiator Chainと実行対象のコントラクトが存在するChainとのIBC Channel
-- `signers`: 認証が必要な`Account`の配列
-- `callInfo`: Contractの識別子、関数名、引数などを含む呼び出し情報。フォーマットは[Contract Module](./01-overview.md#contract-module)の仕様で定められる
-- `return_value`: このContractの実行により期待される戻り値(オプション)
-- `links`: このContractの実行時に参照される他のContract呼び出し結果(オプション)。詳細は[Link](#link)の項を参照
+- `cross_chain_channel`: The IBC channel between the initiator chain and the chain where the contract to be executed exists
+- `signers`: An array of `Accounts` that need to be authenticated
+- `callInfo`: Call information including contract identifier, function name, and arguments. The format is [Contract Module](./01-overview.md#contract-module) specification
+- `return_value`: The return value expected from the execution of this contract (optional)
+- `links`: Optional results of other contract calls that will be referenced when this contract is executed. See the [Link](#link) section for details
 
-`MsgInitiateTx`が提出されると、[Tx Initiator](./01-overview.md)により処理される。Tx Initiatorは、次に以下の処理を行う:
+When a `MsgInitiateTx` is submitted, it is processed by the [Tx Initiator](./01-overview.md). The Tx Initiator then does the following:
 
-- `MsgInitiateTx`からTxIDを生成し、未提出であることを確認したうえで、TxIDと`MsgInitiateTx`を保存する
-- `commit_protocol`をInitiator Chainがサポートしているかを確認する
-- `timeout_height`, `timeout_timestamp`が過ぎていないことを確認する
+- Generate a TxID from the `MsgInitiateTx`, verifies that it has not been submitted, and saves the TxID and the `MsgInitiateTx`
+- Check if `commit_protocol` is supported by the initiator chain.
+- Ensure that `timeout_height` and `timeout_timestamp` have not passed
 
-これらの処理の後、[Link処理](#link)を行う。
+After these processes, [Link processing](#link) is performed.
 
 ## Link
 
-Linkは、[Cross-chain calls](./02-smart-contract.md)を行うContract Transaction間の関連付けを行う機能である。Initiator Chainは`MsgInitiateTx`の提出時にLinkerを用いて各Linkを対応する呼び出し結果へ解決する。
+Link is functionality to associate contract transactions that make [cross-chain calls](./02-smart-contract.md). The initiator chain resolves each link to the corresponding result of the call using Linker when the `MsgInitiateTx` is submitted.
 
-Cross-chainのContract関数呼び出しには、以下の点を考慮する必要がある:
+The following points should be considered when calling cross-chain contract functions:
 
-1. 各Contract関数はそれぞれのChain上で並行して実行される場合がある
-2. 外部のContract関数の実行はその呼び出し元の関数の実行とAtomicに行われる必要がある
-3. 外部のContract関数の実行による返り値を呼び出し元関数で参照できる
+1. Each contract function may be executed in parallel on each chain
+2. The execution of an external contract function must be atomic to the execution of its caller function
+3. the calling function can reference the return value from the execution of the external contract function
 
-1.は、[State store](./05-state-store.md)のLocking mechanismで直列化可能性が保証され、2.は、[Atomic commit protocol](./04-atomic-commit-protocol.md)により保証される。Linkは、3の要素を実現するための機能であり、Transaction提出者はCross-chain callを行う`ContractTransaction`の`links`として参照先のChainを指定することで関連付けることが可能となる。なお、Linkは、`contract_transactions`内の参照先の`ContractTransaction`のインデックスとして表される。
+Point 1. is guaranteed to be serializable by the locking mechanism in [State store](./05-state-store.md), and point 2. is guaranteed by [Atomic commit protocol](./04-atomic-commit-protocol.md). Link is a functionality to realize point 3. and the submitter of a transaction can associate it by specifying the chain to be referred to as `links` in a `ContractTransaction` that performs a cross-chain call. Note that Link is represented as the index of the referenced `ContractTransaction` in `contract_transactions`.
 
-Linkが指すContract Transaction(calleeTx)と、Linkを参照するContract Transaction(callerTx)は以下のように処理される:
+The Contract Transaction (calleeTx) pointed to by Link and the Contract Transaction (callerTx) referring to Link are processed as follows:
 
-1. Linkerは、calleeTxの`call_info`と`signers`から構成されるものをキーとし、`return_value`を値とする`CallResult`を生成する
-2. Linkerは、calleeTxの`cross_chain_channel`をcallerが利用可能なIBC Channelに解決し、それを`CallResult`にセットする
-3. TxInitiatorは、callerTxの`ContractTransaction`と`CallResult`から`ResolvedContractTransaction`を生成する。`ResolvedContractTransaction`は以下のような定義となる。
+1. The Linker generates a `CallResult` whose key is composed of `call_info` and `signers` of the calleeTx and whose value is `return_value`
+2. The Linker resolves the `cross_chain_channel` of the calleeTx to an IBC channel available to the caller. Then, it sets the resolved to the `CallResult`
+3. The TxInitiator generates a `ResolvedContractTransaction` from the callerTx's `ContractTransaction` and `CallResult`. The definition of `ResolvedContractTransaction` is as follows
 
 ```proto
 message ResolvedContractTransaction {
@@ -115,21 +115,21 @@ message ResolvedContractTransaction {
 }
 ```
 
-TxInitiatorは、Linkの解決後、Transactionの[認証処理](#authentication)を行う。
+After resolving the link, the TxInitiator performs the [authentication process](#authentication) of the Transaction.
 
 ## Authentication
 
-Transactionの認証は、[Authenticator](./01-overview.md#authenticator)により行われる。Authenticatorは、Initiator Chainでの認証方式のほか、IBC Channelで接続される他チェーンでの認証方式を提供する。
+Transaction authentication is performed by the [Authenticator](./01-overview.md#authenticator). The Authenticator provides authentication methods for the initiator chain and other chains connected by the IBC channel.
 
-Transactionの認証は、`contract_transactions`の各Contract Transactionの`signers`に指定されたAccountにより行われる。また、認証が完了するまで実行はブロックされる。
+Authentication of a transaction is performed by the accounts specified in `signers` of each contract transaction in `contract_transactions`. The execution is blocked until the authentication is completed.
 
-認証は各Accountの`AuthType`で指定された方式を満たす必要がある。各方式ごとに対応するMsgが定義されており、対象のTxIDを指定し、決められた方式を満たすことで承認が可能である。
+The authentication must satisfy each account's method specified in `AuthType`. A corresponding Msg, where the target TxID is set, is defined for each authentication method, and authorization is possible by satisfying the specified one.
 
-現在、認証方式として、`SignTx`, `IBCSignTx`, `ExtSignTx`がサポートされている。各方式とそれらに対応するMsgの定義を以下で述べる。
+Currently, `SignTx`, `IBCSignTx`, and `ExtSignTx` are supported as authentication methods. The definitions of each method and their corresponding Msg are described below.
 
 ### SignTx
 
-SignTxは、Transactionが提出されたチェーンの認証方式にしたがって認証を行う方式である。これは、`AuthMode`が`AUTH_MODE_LOCAL`で指定されたAccountの認証が可能である。
+SignTx is a method that uses the authentication method of the chain in which the transaction is submitted. It can authenticate accounts with `AuthMode` specified as `AUTH_MODE_LOCAL`.
 
 ```proto
 message MsgSignTx {
@@ -140,7 +140,7 @@ message MsgSignTx {
 
 ### IBCSignTx
 
-IBCSignTxは、Transactionが提出されたチェーンとIBC Channelで接続されたチェーンの認証方式にしたがって認証を行う方式である。これは、`AuthMode`が`AUTH_MODE_CHANNEL`で指定されたAccountの認証が可能である。なお、そのAccountは、`option`として認証を許可するIBC Channelの情報を保持する必要がある。
+IBCSignTx is a method that uses the authentication method of the chain connected by the IBC channel to the chain where the transaction was submitted. It can authenticate accounts whose `AuthMode` are specified by `AUTH_MODE_CHANNEL`. Note that the accounts should have the information of the IBC channel to allow authentication as `option`.
 
 ```proto
 message MsgIBCSignTx {
@@ -154,9 +154,9 @@ message MsgIBCSignTx {
 
 ### ExtSignTx
 
-ExtSignTxは、開発者定義の認証式にしたがって認証を行う方式である。これは、`AuthMode`が`AUTH_MODE_EXTENSION`で指定されたAccountの認証が可能である。
+ExtSignTx is a method that performs authentication according to a developer-defined authentication formula. It can authenticate accounts whose `AuthMode` are specified as `AUTH_MODE_EXTENSION`.
 
-これに対応するAccountは`option`としてAuthExtensionVerifierを実装するproto.Messageを保持する必要がある。
+The corresponding account has to hold proto.Message that implements AuthExtensionVerifier as `option`.
 
 ```proto
 message MsgExtSignTx {
@@ -171,16 +171,16 @@ type AuthExtensionVerifier interface {
 }
 ```
 
-このような拡張認証の実装例は[ここ](https://github.com/datachainlab/cross/blob/v0.2.0/simapp/samplemod/types/auth.go)を参照。
+See [here](https://github.com/datachainlab/cross/blob/v0.2.0/simapp/samplemod/types/auth.go) for an example of such an extended authentication implementation.
 
 ## Transaction Execution
 
-トランザクションの全ての認証が完了した後に、`Tx Runner`は、`commit_protocol`に従いAtomicなCommitを行うフローを開始する。フローの各ステップでは、各Chainと対応する`ResolvedContractTransaction`を含めたPacketを送信する。Commitのフローの種類とそれぞれの詳細については、[Atomic commit protocolの章](./04-atomic-commit-protocol.md)で説明する。
+After all authentication of the transaction is completed, `Tx Runner` starts the flow of Atomic Commit according to the `commit_protocol`. Each step of the flow sends a packet including the `ResolvedContractTransaction` corresponding to each chain; For more information on the different types of commit flows and the details of each, see [the Atomic commit protocol chapter](./04-atomic-commit-protocol.md).
 
-各Chain上で次のようにContractは処理される:
+On each chain, a contract is processed as follows:
 
-- `ResolvedContractTransaction`を処理し、[Contract Module](./01-overview.md#contract-module)で定義されるContract関数を呼び出す
-- ContractがCross-chain callsを含む場合、`Call`の引数`ChannelInfo`と`ContractCallInfo`が対応する`ResolvedContractTransaction`の`CallResult`の値と一致することを検証する
-- Contractの実行後、コミットフローに応じて[Contract Manager](./01-overview.md#contract-manager)のPrecommitもしくはCommitImmediatelyを呼び出し状態を保存する
+- Process a `ResolvedContractTransaction` and returns it to [Contract Module](./01-overview.md#contract-module)
+- If the contract contains cross-chain calls, verify that the arguments `ChannelInfo` and `ContractCallInfo` of the `Call` match the values of `CallResult` of the corresponding `ResolvedContractTransaction`
+- After the contract is executed, call the Contract Manager's Precommit or CommitImmediately depending on the commit flow to save the status
 
-Commitフローの種類にかかわらず、`MsgInitiateTx`に含まれる全てのContract Transactionの実行が成功した場合のみ更新はコミットされ、いずれかが失敗した場合は全てのContract Transactionは中止されることが保証されている。
+Regardless of the type of Commit flow, it is guaranteed that the update will only be committed if all Contract Transactions included in `MsgInitiateTx` are successfully executed, and if any of them fail, all Contract Transactions will be aborted.

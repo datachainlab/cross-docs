@@ -1,18 +1,25 @@
 ---
 sidebar_position: 1
+slug: /
 ---
+<!-- This meta tag needs to be added to the root page -->
+<head>
+    <meta name="google-site-verification" content="WOO3lZv61a34McG2UBDokssGzsFQ8f-y8INVMqPAhr0" />
+</head>
 
 # Introduction
 
-Cross Frameworkは、複数のBlockchainに分散したデータの参照や機能の実行をAtomicに行う、[Cross-chain smart contract](./03-architecture/02-smart-contract.md) の開発を可能にするフレームワークである。
+Cross Framework enables the development of cross-chain smart contracts that reference data and perform functions distributed across multiple Blockchains.
 
-Blockchainは一般に他BlockchainとのInteroperabilityの能力は乏しく、トランザクションのサポートも単一のChain上の処理に特化しており、別のシステムの処理を含むトランザクションのサポートはされていないことが多い。それにより、各ブロックチェーンで形成されたネットワークのサイロ化が起こり、それぞれで立ち上がったエコシステムの発展を制限してしまうことになる。また、ブロックチェーンシステムのスケーリング面においても、(ブロックチェーンによる特性を保つためには)連携するアプリケーションは同一のブロックチェーン上にある必要性があることが厳しい制約となるケースがある。
+Blockchain generally lacks the ability to interoperate with other blockchains. It can process a transaction on a single blockchain and does not support a transaction involving processing on multiple blockchains. As a result, it can lead to network silos and limit ecosystem expansion. In addition, scaling issues occur due to the need for applications that integrate to be on the identical blockchain.
 
-Cross Frameworkは、このような制約を取り除き、複数のブロックチェーン間にまたがるコントラクトを実行することを可能にする。さらに各ブロックチェーン上での処理をアトミックに実行を可能にする。そのためには、各Chainのコントラクトが同じ結果にいたるためのAtomic commit protocolをサポートするトランザクションの仕組みとそれを実現するための通信プロトコルが必要である。前者のトランザクションの仕組みの概要は[Cross-chain Transaction](./03-architecture/03-cross-chain-transaction.md)で述べられる。また、後者の通信プロトコルには[IBC](https://github.com/cosmos/ibc)を利用する。IBCはクロスチェーンのメッセージングやリレーの仕様を定めており、検証方式については、IBC Clientとして抽象化され、チェーンごとに仕様が定められる。
+Cross Framework removes these constraints and allows for the execution of contracts across multiple blockchains. It also provides atomic transaction execution on each blockchain. A transaction mechanism that supports the atomic commit protocol is necessary to achieve this so that each chain's contract can reach the same decision. It also requires a communication protocol to build it on the multiple chains.
 
-現在、実装は[Go](https://github.com/datachainlab/cross)と[Solidity](https://github.com/datachainlab/cross-solidity)(現在一部機能のみ)が提供されている。Go実装はTendermintを用いるChainとHyperledger Fabricをサポートしている。Solidity実装は、Ethereum、Hyperledger Besu, GoQuorumをサポートする。
+An overview of the transaction mechanism is described in [Cross-chain Transaction](./03-architecture/03-cross-chain-transaction.md). In addition, [IBC](https://github.com/cosmos/ibc) is used as the communication protocol. Also, IBC defines specifications for cross-chain messaging and relays, and verification methods are abstracted as IBC Client, and specifications are defined for each chain.
+
+Currently, implementations [Go](https://github.com/datachainlab/cross) and [solidity](https://github.com/datachainlab/cross-solidity)(currently only partial functionality) are available. The Go implementation supports Cosmos-SDK chain and Hyperledger Fabric, and the solidity implementation supports Ethereum, Hyperledger Besu, and GoQuorum.
 
 ## Sections
 
-- [Architecture](./03-architecture/01-overview.md): アーキテクチャの説明
-- (WIP)[Getting started](./02-getting-started/01-install.md): Cross Frameworkを使ったSmart Contractを構築するための手順
+- [Architecture](./03-architecture/01-overview.md): Architecture Overview
+- (WIP)[Getting started](./02-getting-started/01-install.md): How to develop a smart contract using Cross Framework
