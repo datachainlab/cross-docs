@@ -1,13 +1,13 @@
 ---
 sidebar_position: 1
 slug: /
+title: Introduction
 ---
+
 <!-- This meta tag needs to be added to the root page -->
 <head>
     <meta name="google-site-verification" content="WOO3lZv61a34McG2UBDokssGzsFQ8f-y8INVMqPAhr0" />
 </head>
-
-# Introduction
 
 Cross Framework enables the development of cross-chain smart contracts that reference data and perform functions distributed across multiple Blockchains.
 
