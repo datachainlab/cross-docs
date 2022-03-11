@@ -2,6 +2,10 @@
 sidebar_position: 1
 slug: /
 ---
+<!-- This meta tag needs to be added to the root page -->
+<head>
+    <meta name="google-site-verification" content="WOO3lZv61a34McG2UBDokssGzsFQ8f-y8INVMqPAhr0" />
+</head>
 
 # Introduction
 
