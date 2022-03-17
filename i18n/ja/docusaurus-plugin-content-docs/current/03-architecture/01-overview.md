@@ -3,7 +3,7 @@ sidebar_position: 1
 id: overview
 ---
 
-# Overivew
+# Overview
 
 Cross Frameworkは次のようなコンポーネントから構成される。
 

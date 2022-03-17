@@ -52,4 +52,4 @@ func Peg(store Store, to Account, amount uint64) {
 }
 ```
 
-Deposit関数は単に残高をコントラクトアドレスにdepositするだけの関数であり、成功したかどうかの真偽値を返す。一方、Peg関数はChainA上のDeposit関数を`Call`で呼び出し、その戻り値を取得している。InitiateTx時に2つの関数呼び出しをLinkさせることでこのようなコントラクト間呼び出しが可能になる。なお、InitiateTxやLinkの仕様については[03](./03-cross-chain-transaction.md#link)で述べる。
+Deposit関数は単に残高をコントラクトアドレスにdepositするだけの関数であり、成功したかどうかの真偽値を返す。一方、Peg関数はChainA上のDeposit関数を`Call`で呼び出し、その戻り値を取得している。InitiateTx時に2つの関数呼び出しをLinkさせることでこのようなコントラクト間呼び出しが可能になる。なお、InitiateTxやLinkの仕様については[リンクの項](./03-cross-chain-transaction.md#link)で述べる。

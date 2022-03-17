@@ -79,7 +79,7 @@ message ContractTransaction {
 - `return_value`: このContractの実行により期待される戻り値(オプション)
 - `links`: このContractの実行時に参照される他のContract呼び出し結果(オプション)。詳細は[Link](#link)の項を参照
 
-`MsgInitiateTx`が提出されると、[Tx Initiator](./01-overview.md)により処理される。Tx Initiatorは、次に以下の処理を行う:
+`MsgInitiateTx`が提出されると、[Tx Initiator](./01-overview.md#tx-initiator)により処理される。Tx Initiatorは、次に以下の処理を行う:
 
 - `MsgInitiateTx`からTxIDを生成し、未提出であることを確認したうえで、TxIDと`MsgInitiateTx`を保存する
 - `commit_protocol`をInitiator Chainがサポートしているかを確認する
@@ -89,7 +89,7 @@ message ContractTransaction {
 
 ## Link
 
-Linkは、[Cross-chain calls](./02-smart-contract.md)を行うContract Transaction間の関連付けを行う機能である。Initiator Chainは`MsgInitiateTx`の提出時にLinkerを用いて各Linkを対応する呼び出し結果へ解決する。
+Linkは、[Cross-chain calls](./02-smart-contract.md#cross-chain-calls)を行うContract Transaction間の関連付けを行う機能である。Initiator Chainは`MsgInitiateTx`の提出時にLinkerを用いて各Linkを対応する呼び出し結果へ解決する。
 
 Cross-chainのContract関数呼び出しには、以下の点を考慮する必要がある:
 
