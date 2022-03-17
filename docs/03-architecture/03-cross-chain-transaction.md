@@ -79,7 +79,7 @@ A Contract Transaction consists of the following elements:
 - `return_value`: The return value expected from the execution of this contract (optional)
 - `links`: Optional results of other contract calls that will be referenced when this contract is executed. See the [Link](#link) section for details
 
-When a `MsgInitiateTx` is submitted, it is processed by the [Tx Initiator](./01-overview.md). The Tx Initiator then does the following:
+When a `MsgInitiateTx` is submitted, it is processed by the [Tx Initiator](./01-overview.md#tx-initiator). The Tx Initiator then does the following:
 
 - Generate a TxID from the `MsgInitiateTx`, verifies that it has not been submitted, and saves the TxID and the `MsgInitiateTx`
 - Check if `commit_protocol` is supported by the initiator chain.
@@ -89,7 +89,7 @@ After these processes, [Link processing](#link) is performed.
 
 ## Link
 
-Link is functionality to associate contract transactions that make [cross-chain calls](./02-smart-contract.md). The initiator chain resolves each link to the corresponding result of the call using Linker when the `MsgInitiateTx` is submitted.
+Link is functionality to associate contract transactions that make [cross-chain calls](./02-smart-contract.md#cross-chain-calls). The initiator chain resolves each link to the corresponding result of the call using Linker when the `MsgInitiateTx` is submitted.
 
 The following points should be considered when calling cross-chain contract functions:
 
@@ -164,6 +164,7 @@ message MsgExtSignTx {
   repeated Account signers = 2;
 }
 ```
+
 ```go
 type AuthExtensionVerifier interface {
 	proto.Message

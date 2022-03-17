@@ -9,7 +9,6 @@ Smart contract is a program that can be executed on Blockchain. They have a stat
 
 Many blockchains, such as Ethereum and Hyperledger fabric, only support transactions that process a single chain or channel and often do not have interoperability with other blockchains.
 
-
 ## Cross-chain smart contract
 
 In Cross Framework, it enables the development of a smart contract (C-chain smart contract) that invokes and references smart contracts' functions and states between different chains. It is also possible to invoke two independent contracts atomically. Thus, developers will only focus on developing business logic.
@@ -56,4 +55,4 @@ func Peg(store Store, to Account, amount uint64) {
 }
 ```
 
-Deposit function deposits the balance to the contract address and returns a boolean value of whether it is successful or not. Peg function calls the Deposit function on chainA with `Call` and gets its return value. Linking the two function calls in InitiateTx process enables such Cross-chain call. For more information on the specifications of InitiateTx and Link, please refer to [03](./03-cross-chain-transaction.md#link).
+Deposit function deposits the balance to the contract address and returns a boolean value of whether it is successful or not. Peg function calls the Deposit function on chainA with `Call` and gets its return value. Linking the two function calls in InitiateTx process enables such Cross-chain call. For more information on the specifications of InitiateTx and Link, please refer to [Link](./03-cross-chain-transaction.md#link).

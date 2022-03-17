@@ -3,7 +3,7 @@ sidebar_position: 1
 id: overview
 ---
 
-# Overivew
+# Overview
 
 Cross Framework is composed of the following components:
 
@@ -27,7 +27,7 @@ Therefore, it is necessary to specify TxID to identify the target transaction at
 
 ### Tx Runner
 
-Tx Runner executes transactions that Authenticator has successfully authenticated. Since transactions are executed on multiple chains, they must be able to be executed atomically. For this reason, it supports the [Atomic commit protocol](. /03-architecture/04-atomic-commit-protocol.md). e.g. Two-phase commit protocol, Simple commit protocol
+Tx Runner executes transactions that Authenticator has successfully authenticated. Since transactions are executed on multiple chains, they must be able to be executed atomically. For this reason, it supports the [Atomic commit protocol](./03-architecture/04-atomic-commit-protocol.md). e.g. Two-phase commit protocol, Simple commit protocol
 
 A commit protocol that a Transaction uses depends on the method specified by `MsgInitiateTx`. The submitting chain is the coordinator of the commit protocol and communicates with other chains via IBC Channel. It decides whether to commit or abort and requests the result to each participant.
 
