@@ -11,11 +11,11 @@ Cross Frameworkは次のようなコンポーネントから構成される。
 
 ### Tx Initiator
 
-Tx InitiatorはClientから提出されたTransaction(MsgInitiateTx)を受け付ける。提出後、基本的なバリデーションの後に、Cross-chain callsのためにContract Transaction間の[Link処理](./cross-chain-transaction#link)を行う。
+Tx InitiatorはClientから提出されたTransaction(MsgInitiateTx)を受け付ける。提出後、基本的なバリデーションの後に、Cross-chain callsのためにContract Transaction間の[Link処理](./03-cross-chain-transaction.md#link)を行う。
 
 次に、提出トランザクションごとにユニークなTxIDを生成し、Transactionに含まれるContract Transactionの認証に必要なAccountを取り出し、Authenticatorを呼び出す。トランザクションは、Authenticatorにより全ての必要な認証が完了するまでブロックされる。完了後、Tx Runnerによりトランザクションは開始される。
 
-Transactionの提出の詳細は[Inititate Transaction](./cross-chain-transaction#initiate-transaction)でも述べられる。
+Transactionの提出の詳細は[Inititate Transaction](./03-cross-chain-transaction.md#initiate-transaction)でも述べられる。
 
 ### Authenticator
 
@@ -23,11 +23,11 @@ Authenticatorはトランザクションの認証処理の提供とその状態�
 
 各認証処理はトランザクションの提出チェーンで同期的に行われるだけでなく、非同期での処理や別チェーンからのPacketにより処理される場合がある。
 
-そのため、認証時には対象のトランザクションを識別するためにTxIDを指定する必要がある。認証方式の詳細は[Authentication](./cross-chain-transaction#authentication)で述べる。
+そのため、認証時には対象のトランザクションを識別するためにTxIDを指定する必要がある。認証方式の詳細は[Authentication](./03-cross-chain-transaction.md#authentication)で述べる。
 
 ### Tx Runner
 
-Tx Runnerは、Authenticatorにより認証が成功したトランザクションを実行する。トランザクションは複数チェーン上で実行されるため、それらをAtomicに実行できなければならない。そのため、[Atomic commit protocol](./03-architecture/04-atomic-commit-protocol.md)をサポートしている。e.g. Two-phase commit protocol, Simple commit protocol
+Tx Runnerは、Authenticatorにより認証が成功したトランザクションを実行する。トランザクションは複数チェーン上で実行されるため、それらをAtomicに実行できなければならない。そのため、[Atomic commit protocol](./04-atomic-commit-protocol.md)をサポートしている。e.g. Two-phase commit protocol, Simple commit protocol
 
 TransactionがどのCommit protocolを用いるかは、`MsgInitiateTx`で指定された方式に従う。提出ChainはそのCommit protocolのcoordinatorとなり、他チェーンとIBC Channelを通してメッセージングを行う。そして、Commit or Abortの決定を行い、各参加者にその結果をリクエストする。
 

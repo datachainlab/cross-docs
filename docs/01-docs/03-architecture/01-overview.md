@@ -15,7 +15,7 @@ Tx Initiator accepts a transaction (MsgInitiateTx) submitted by an actor. After 
 
 It then generates a unique TxID for each submitted transaction, retrieves the Account required to authenticate the Contract Transaction contained in the transaction, and calls Authenticator. The transaction is blocked until the Authenticator completes all necessary authentications. After completion, Tx Runner initiates the transaction.
 
-The details of submitting a Transaction are described in [Initiate Transaction](./cross-chain-transaction#initiate-transaction).
+The details of submitting a Transaction are described in [Initiate Transaction](./03-cross-chain-transaction.md#initiate-transaction).
 
 ### Authenticator
 
@@ -23,11 +23,11 @@ Authenticator provides a transaction authentication process and manages its stat
 
 Each authentication process is not only performed synchronously in the transaction submission chain but may also be processed asynchronously or by a packet from another chain.
 
-Therefore, it is necessary to specify TxID to identify the target transaction at the authentication. The details of the authentication process are described in [Authentication](. /cross-chain-transaction#authentication).
+Therefore, it is necessary to specify TxID to identify the target transaction at the authentication. The details of the authentication process are described in [Authentication](./03-cross-chain-transaction.md#authentication).
 
 ### Tx Runner
 
-Tx Runner executes transactions that Authenticator has successfully authenticated. Since transactions are executed on multiple chains, they must be able to be executed atomically. For this reason, it supports the [Atomic commit protocol](./03-architecture/04-atomic-commit-protocol.md). e.g. Two-phase commit protocol, Simple commit protocol
+Tx Runner executes transactions that Authenticator has successfully authenticated. Since transactions are executed on multiple chains, they must be able to be executed atomically. For this reason, it supports the [Atomic commit protocol](./04-atomic-commit-protocol.md). e.g. Two-phase commit protocol, Simple commit protocol
 
 A commit protocol that a Transaction uses depends on the method specified by `MsgInitiateTx`. The submitting chain is the coordinator of the commit protocol and communicates with other chains via IBC Channel. It decides whether to commit or abort and requests the result to each participant.
 
