@@ -3,7 +3,7 @@ sidebar_position: 6
 id: demo
 ---
 
-# Execution
+# Demo
 
 This part explains how to set up Cross-chain environments and execute demos.
 
